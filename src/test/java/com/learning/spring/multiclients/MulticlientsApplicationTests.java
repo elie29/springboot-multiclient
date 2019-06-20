@@ -16,13 +16,24 @@ public class MulticlientsApplicationTests
 {
 
    @Autowired
-   private JdbcTemplate jdbcTemplate;
+   private JdbcTemplate jdbcMasterTemplate;
+
+   @Autowired
+   private JdbcTemplate jdbcClientTemplate;
 
    @Test
-   public void testJdbc()
+   public void testMasterJdbc()
    {
       String sql = "select count(*) FROM organisation";
-      int result = jdbcTemplate.queryForObject(sql, Integer.class);
+      int result = jdbcMasterTemplate.queryForObject(sql, Integer.class);
       assertThat(result, is(7));
+   }
+
+   @Test
+   public void testClientJdbc()
+   {
+      String sql = "select count(*) FROM employee";
+      int result = jdbcClientTemplate.queryForObject(sql, Integer.class);
+      assertThat(result, is(19));
    }
 }

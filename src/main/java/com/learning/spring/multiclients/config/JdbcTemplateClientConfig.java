@@ -14,12 +14,12 @@ import javax.sql.DataSource;
  * Manual JDBCTemplate configuration:
  * https://docs.spring.io/spring-boot/docs/current/reference/html/howto-data-access.html
  */
-public class JdbcTemplateConfig
+public class JdbcTemplateClientConfig
 {
 
    @Bean
-   @ConfigurationProperties("spring.datasource.master")
-   public DataSource dataSource()
+   @ConfigurationProperties("spring.datasource.client")
+   public DataSource dataSourceClient()
    {
       // HikariDataSource uses jdbc-url and not url so when using
       // DataSourceBuilder we need to provide jdbc-url in application.properties
@@ -28,9 +28,9 @@ public class JdbcTemplateConfig
 
    @Bean
    @Autowired
-   public JdbcTemplate jdbcTemplate(DataSource dataSource)
+   public JdbcTemplate jdbcClientTemplate(DataSource dataSourceClient)
    {
-      return new JdbcTemplate(dataSource);
+      return new JdbcTemplate(dataSourceClient);
    }
 }
 

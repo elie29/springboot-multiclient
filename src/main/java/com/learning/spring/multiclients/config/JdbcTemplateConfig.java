@@ -1,6 +1,7 @@
 package com.learning.spring.multiclients.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ public class JdbcTemplateConfig
 {
 
    @Bean
+   @ConfigurationProperties("spring.datasource.master")
    public DataSource dataSource()
    {
       // HikariDataSource uses jdbc-url and not url so when using

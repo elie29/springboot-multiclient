@@ -1,8 +1,9 @@
 package com.learning.spring.multiclients.config;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,11 +20,16 @@ public class JdbcTemplateClientConfig
 
    @Bean
    @ConfigurationProperties("spring.datasource.client")
-   public DataSource dataSourceClient()
+   public DataSourceProperties dataSourceClientProperties()
    {
-      // HikariDataSource uses jdbc-url and not url so when using
-      // DataSourceBuilder we need to provide jdbc-url in application.properties
-      return DataSourceBuilder.create().build();
+      return new DataSourceProperties();
+   }
+
+   @Bean
+   public HikariDataSource dataSourceClient()
+   {
+      // DataSourceProperties is taking care of the url/jdbcUrl translation, so we use url
+      return dataSourceClientProperties().initializeDataSourceBuilder().type(HikariDataSource.class).build();
    }
 
    @Bean

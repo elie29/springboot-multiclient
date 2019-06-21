@@ -20,7 +20,7 @@ public class JdbcTemplateMasterConfig
 {
 
    @Bean
-   @Primary // required to be called first
+   @Primary // required once to override spring initializer
    @ConfigurationProperties("spring.datasource.master")
    public DataSourceProperties dataSourceMasterProperties()
    {

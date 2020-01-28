@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -50,4 +51,19 @@ public class MulticlientsApplicationTests {
       assertThat(result1, hasSize(greaterThan(2)));
    }
 
+   @Test
+   public void testInsertClientWithMysqlDate() {
+      final String sql = "INSERT INTO employee VALUES (null, ?, CURRENT_TIME)";
+      int res = jdbcClientTemplate.update(sql, "name-" + Math.random());
+      log.info("Client insert {}", res);
+      log.info("Client insert {}", jdbcClientTemplate.queryForList("select * FROM employee"));
+   }
+
+   @Test
+   public void testInsertMasterWithSpringbootDate() {
+      final String sql = "INSERT INTO employee VALUES (null, ?, ?)";
+      int res = jdbcMasterTemplate.update(sql, "name-" + Math.random(), LocalDateTime.now());
+      log.info("Master insert {}", res);
+      log.info("Master insert {}", jdbcMasterTemplate.queryForList("select * FROM employee"));
+   }
 }

@@ -3,7 +3,6 @@ package com.learning.spring.multiclients.config;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -26,8 +25,7 @@ public class JdbcTemplateClientConfig {
       return new DataSourceProperties();
    }
 
-   // Named bean is required
-   @Bean(name = "clientDataSource")
+   @Bean
    public DataSource clientDataSource() {
       // DataSourceProperties is taking care of the url/jdbcUrl translation, so we use url
       DataSourceProperties properties = clientDataSourceProperties();
@@ -36,8 +34,8 @@ public class JdbcTemplateClientConfig {
    }
 
    @Bean
-   @Autowired
-   public JdbcTemplate jdbcClientTemplate(@Qualifier("clientDataSource") DataSource clientDataSource) {
+   @Autowired // argument name should fit method name otherwise use named bean and qualifier
+   public JdbcTemplate jdbcClientTemplate(DataSource clientDataSource) {
       return new JdbcTemplate(clientDataSource);
    }
 }

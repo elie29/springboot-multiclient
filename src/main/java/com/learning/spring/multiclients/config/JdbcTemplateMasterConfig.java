@@ -1,7 +1,9 @@
 package com.learning.spring.multiclients.config;
 
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -15,30 +17,31 @@ import javax.sql.DataSource;
 /**
  * Manual JDBCTemplate configuration:
  * https://docs.spring.io/spring-boot/docs/current/reference/html/howto-data-access.html
+ * @Primary is required so that the database initializer feature uses this one
  */
-public class JdbcTemplateMasterConfig
-{
+@Slf4j
+public class JdbcTemplateMasterConfig {
 
    @Bean
-   @Primary // required once to override spring initializer
+   @Primary
    @ConfigurationProperties("spring.datasource.master")
-   public DataSourceProperties dataSourceMasterProperties()
-   {
+   public DataSourceProperties masterDataSourceProperties() {
       return new DataSourceProperties();
    }
 
-   @Bean
-   public DataSource dataSourceMaster()
-   {
-      // DataSourceProperties is taking care of the url/jdbcUrl translation, so we use url
-      return dataSourceMasterProperties().initializeDataSourceBuilder().type(HikariDataSource.class).build();
+   // Named bean is required in order to choose desired dataSource
+   @Bean(name = "masterDataSource")
+   @Primary
+   public DataSource masterDataSource() {
+      DataSourceProperties properties = masterDataSourceProperties();
+      log.info("Master database URL {}", properties.getUrl());
+      return properties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
    }
 
    @Bean
    @Autowired
-   public JdbcTemplate jdbcMasterTemplate(DataSource dataSourceMaster)
-   {
-      return new JdbcTemplate(dataSourceMaster);
+   public JdbcTemplate jdbcMasterTemplate(@Qualifier("masterDataSource") DataSource masterDataSource) {
+      return new JdbcTemplate(masterDataSource);
    }
 }
 

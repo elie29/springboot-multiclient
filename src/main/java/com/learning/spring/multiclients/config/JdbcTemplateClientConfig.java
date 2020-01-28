@@ -1,7 +1,9 @@
 package com.learning.spring.multiclients.config;
 
 import com.zaxxer.hikari.HikariDataSource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -15,28 +17,27 @@ import javax.sql.DataSource;
  * Manual JDBCTemplate configuration:
  * https://docs.spring.io/spring-boot/docs/current/reference/html/howto-data-access.html
  */
-public class JdbcTemplateClientConfig
-{
+@Slf4j
+public class JdbcTemplateClientConfig {
 
    @Bean
    @ConfigurationProperties("spring.datasource.client")
-   public DataSourceProperties dataSourceClientProperties()
-   {
+   public DataSourceProperties clientDataSourceProperties() {
       return new DataSourceProperties();
    }
 
-   @Bean
-   public HikariDataSource dataSourceClient()
-   {
+   // Named bean is required
+   @Bean(name = "clientDataSource")
+   public DataSource clientDataSource() {
       // DataSourceProperties is taking care of the url/jdbcUrl translation, so we use url
-      return dataSourceClientProperties().initializeDataSourceBuilder().type(HikariDataSource.class).build();
+      DataSourceProperties properties = clientDataSourceProperties();
+      log.info("Client database URL {}", properties.getUrl());
+      return properties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
    }
 
    @Bean
    @Autowired
-   public JdbcTemplate jdbcClientTemplate(DataSource dataSourceClient)
-   {
-      return new JdbcTemplate(dataSourceClient);
+   public JdbcTemplate jdbcClientTemplate(@Qualifier("clientDataSource") DataSource clientDataSource) {
+      return new JdbcTemplate(clientDataSource);
    }
 }
-
